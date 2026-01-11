@@ -11,7 +11,24 @@ if (!fs.existsSync(uploadDir)) {
 // Configure Storage (Where to save the temp file)
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, uploadDir);
+        // Organize files into subdirectories based on field name
+        let subDir = uploadDir;
+        if (file.fieldname === 'loi') {
+            subDir = path.join(uploadDir, 'loi');
+        } else if (file.fieldname === 'photo') {
+            subDir = path.join(uploadDir, 'photos');
+        } else if (file.fieldname === 'sign') {
+            subDir = path.join(uploadDir, 'signatures');
+        } else if (file.fieldname === 'nda') {
+            subDir = path.join(uploadDir, 'nda');
+        }
+        
+        // Ensure directory exists
+        if (!fs.existsSync(subDir)) {
+            fs.mkdirSync(subDir, { recursive: true });
+        }
+        
+        cb(null, subDir);
     },
     filename: (req, file, cb) => {
         // Save with timestamp to prevent overwriting

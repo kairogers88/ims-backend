@@ -3,7 +3,10 @@ require('dotenv').config();
 
 /**
  * Authorization middleware factory.
- * @param {string} requiredRole Role required to access the route
+ * @param {string|string[]} requiredRole Role(s) required to access the route
+ *   - 'Admin' for admin only
+ *   - 'Intern' for any intern role
+ *   - ['Admin', 'Intern'] for both
  * @returns Express middleware
  */
 const auth = (requiredRole) => {
@@ -15,11 +18,26 @@ const auth = (requiredRole) => {
             }
 
             const token = authHeader.split(' ')[1];
-            const payload = jwt.verify(token, process.env.JWT_SECRET);
+            const payload = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
             req.user = payload;
 
-            if (requiredRole && payload.role !== requiredRole) {
-                return res.status(403).json({ error: 'Insufficient privileges.' });
+            if (requiredRole) {
+                const allowedRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+                
+                // Check if user role matches any allowed role
+                let hasAccess = false;
+                
+                if (allowedRoles.includes('Admin') && payload.role === 'Admin') {
+                    hasAccess = true;
+                } else if (allowedRoles.includes('Intern') && payload.role && payload.role.startsWith('Intern_')) {
+                    hasAccess = true;
+                } else if (allowedRoles.includes(payload.role)) {
+                    hasAccess = true;
+                }
+
+                if (!hasAccess) {
+                    return res.status(403).json({ error: 'Insufficient privileges.' });
+                }
             }
 
             next();

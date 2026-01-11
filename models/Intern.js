@@ -12,15 +12,21 @@ const Intern = sequelize.define('Intern', {
     // Status & Roles
     status: { 
         type: DataTypes.ENUM,
-        values: ['Fresh', 'Pending_Enrollment', 'Pending_Approval', 'Active', 'Rejected', 'Completed'],
+        values: ['Fresh', 'Special_Approval_Required', 'Pending_Enrollment', 'Pending_Approval', 'Active', 'Rejected', 'Completed'],
         defaultValue: 'Fresh'
     },
+    role: { 
+        type: DataTypes.ENUM,
+        values: ['Intern_applied', 'Intern_rejected', 'Intern_approved&ongoing', 'Intern_completed'],
+        defaultValue: 'Intern_applied'
+    },
     rejectionReason: { type: DataTypes.TEXT },
+    specialApprovalNotes: { type: DataTypes.TEXT },
 
     // --- Phase 2: Enrollment Details ---
     passportPhoto: { type: DataTypes.STRING },
     semester: { type: DataTypes.STRING },
-    program: { type: DataTypes.STRING },
+    program: { type: DataTypes.STRING }, // Program/Project name
     department: { type: DataTypes.STRING },
     organization: { type: DataTypes.STRING },
     gender: { type: DataTypes.ENUM('M', 'F', 'O') },
@@ -32,13 +38,9 @@ const Intern = sequelize.define('Intern', {
 
     // --- Phase 3: Admin Onboarding ---
     applicationNo: { type: DataTypes.STRING, unique: true }, // Username
-    password: { type: DataTypes.STRING }, // Hashed
+    password: { type: DataTypes.STRING }, // Hashed with bcrypt
     dateOfJoining: { type: DataTypes.DATEONLY },
-    dateOfLeaving: { type: DataTypes.DATEONLY },
-    role: { 
-        type: DataTypes.STRING, 
-        defaultValue: 'Intern_applied' // Updates to Intern_approved&ongoing
-    }
+    dateOfLeaving: { type: DataTypes.DATEONLY }
 }, {
     timestamps: true
 });

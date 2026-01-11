@@ -1,6 +1,7 @@
 const sequelize = require('../config/database');
 const Intern = require('./Intern');
 const DailyReport = require('./DailyReport');
+const Admin = require('./Admin');
 
 // Relation: One Intern has Many Reports
 Intern.hasMany(DailyReport, { foreignKey: 'internId', as: 'reports' });
@@ -11,4 +12,4 @@ const initDB = async () => {
     console.log("Database Synced");
 };
 
-module.exports = { Intern, DailyReport, initDB };
+module.exports = { Intern, DailyReport, Admin, initDB };
